@@ -6,6 +6,7 @@ triangle
 
 
 def pascal_triangle(n):
+    """Return Pascal's triangle of integers"""
     if n <= 0:
         return []
 

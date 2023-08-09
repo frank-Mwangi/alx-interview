@@ -4,16 +4,20 @@ Dynamic Programming - Minimum operations
 """
 
 
-def minOperations(n: int) -> int:
+def minOperations(n):
     """Function to return fewest no of operations to result in exactly
     n H characters in a file that only allows copy all and
     paste operations"""
-    if (n == 1):
+    if n == 1:
         return 0
-    dp = [0] * (n + 1)
-    for i in range(2, n + 1):
-        dp[i] = i
-    for j in range(2, i):
-        if i % j == 0:
-            dp[i] = min(dp[i], dp[j] + (i // j))
-    return dp[n]
+
+    operations = 0
+    divisor = 2
+
+    while n > 1:
+        if n % divisor == 0:
+            operations += divisor
+            n //= divisor
+        else:
+            divisor += 1
+    return operations

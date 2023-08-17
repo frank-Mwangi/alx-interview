@@ -5,6 +5,7 @@
 
 import sys
 
+
 def print_msg(codes, file_size):
     """
     Prints the computed metrics: total file size and status code counts.
@@ -13,6 +14,7 @@ def print_msg(codes, file_size):
     for key, val in sorted(codes.items()):
         if val != 0:
             print("{}: {}".format(key, val))
+
 
 # Initialize variables
 file_size = 0

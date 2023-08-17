@@ -1,50 +1,55 @@
 #!/usr/bin/python3
-"""Log parsing script"""
+"""
+    This script reads stdin line by line and computes metrics.
+"""
 
 import sys
 
-
-def print_statistics(file_size, status_counts):
-    """Function to print file size and status counts"""
+def print_msg(codes, file_size):
+    """
+    Prints the computed metrics: total file size and status code counts.
+    """
     print("File size:", file_size)
-    for status_code, count in sorted(status_counts.items()):
-        print(f"{status_code}: {count}")
+    for key, val in sorted(codes.items()):
+        if val != 0:
+            print("{}: {}".format(key, val))
 
+# Initialize variables
+file_size = 0
+count_lines = 0
+codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
 
-def main():
-    file_size = 0
-    status_counts = {}
+try:
+    for line in sys.stdin:
+        # Split the line into parts and reverse for easier extraction
+        parsed_line = line.split()
+        parsed_line = parsed_line[::-1]
 
-    try:
-        for line_number, line in enumerate(sys.stdin, start=1):
-            line = line.strip()
-            parts = line.split()
+        if len(parsed_line) > 2:
+            count_lines += 1
 
-            if len(parts) != 10:
-                continue
+            if count_lines <= 10:
+                # Update total file size and status code counts
+                file_size += int(parsed_line[0])
+                code = parsed_line[1]
 
-            ip, _, _, date, _, request, status_code, size = parts
-            if request != ' "GET /projects/260 HTTP/1.1" ':
-                continue
+                if code in codes:
+                    codes[code] += 1
 
-            try:
-                size = int(size)
-                status_code = int(status_code)
-            except ValueError:
-                continue
+            if count_lines == 10:
+                # Print metrics and reset count_lines
+                print_msg(codes, file_size)
+                count_lines = 0
 
-            file_size += size
-            if status_code in (200, 301, 400, 401, 403, 404, 405, 500):
-                status_counts[status_code] = status_counts.get
-                (status_code, 0) + 1
-
-            if line_number % 10 == 0:
-                print_statistics(file_size, status_counts)
-                print()
-
-    except KeyboardInterrupt:
-        print_statistics(file_size, status_counts)
-
-
-if __name__ == "__main__":
-    main()
+finally:
+    # Print metrics in case of a keyboard interruption
+    print_msg(codes, file_size)
